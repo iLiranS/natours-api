@@ -71,7 +71,7 @@ const tourSchema = new mongoose.Schema(
     images: [String],
     createdAt: {
       type: Date,
-      default: Date.now(),
+      default: Date.now,
       select: false
     },
     startDates: [Date],
@@ -116,9 +116,16 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
-tourSchema.virtual('durationWeeks').get(function () {
-  return this.duration / 7;
-});
+// tourSchema.virtual('durationWeeks').get(function () {
+//   return this.duration / 7;
+// });
+
+// virtual populate of reviews
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id'
+})
 
 // DOCUMENT MIDDLEWARE: runs before .save() and .create()
 tourSchema.pre('save', function (next) {

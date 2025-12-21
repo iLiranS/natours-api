@@ -1,4 +1,3 @@
-// rating, createdAt ,ref to tour , ref to user
 const mongoose = require('mongoose')
 const reviewSchema = new mongoose.Schema(
     {
@@ -13,15 +12,15 @@ const reviewSchema = new mongoose.Schema(
         },
         createdAt: {
             type: Date,
-            default: Date.now()
+            default: Date.now
         },
         tour: {
-            type: mongoose.Schema.ObjectId(),
+            type: mongoose.Schema.ObjectId,
             ref: 'Tour',
             required: [true, 'review must have associated tour']
         },
         author: {
-            type: mongoose.Schema.ObjectId(),
+            type: mongoose.Schema.ObjectId,
             ref: 'User',
             required: [true, 'review must have an author']
         }
@@ -31,6 +30,18 @@ const reviewSchema = new mongoose.Schema(
         toObject: { virtuals: true }
     }
 );
+
+reviewSchema.pre(/^find/, function (next) {
+    // this.populate({
+    //     path: 'tour',
+    //     select: '-guides name'
+    // }).populate({
+    this.populate({
+        path: 'author',
+        select: 'name photo'
+    })
+    next();
+})
 
 const Review = mongoose.model('Review', reviewSchema)
 module.exports = Review
