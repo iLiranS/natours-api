@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const User = require('./userModel');
+const Review = require('./reviewModel');
+// const User = require('./userModel');
 // const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
@@ -164,6 +165,13 @@ tourSchema.pre(/^find/, function (next) {
   })
   next();
 })
+// delete associciated reviews
+tourSchema.pre('findOneAndDelete', async function (next) {
+  const doc = await this.model.findOne(this.getQuery()).select('_id');
+  if (doc) await Review.deleteMany({ tour: doc._id });
+  next();
+});
+
 
 tourSchema.post(/^find/, function (docs, next) {
   console.log(`Query took ${Date.now() - this.start} milliseconds!`);
