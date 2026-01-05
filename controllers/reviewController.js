@@ -1,6 +1,14 @@
 const Review = require('./../models/reviewModel')
 const factory = require('./handlerFactory')
+const AppError = require('../utils/appError')
 
+exports.checkIfAuthor = async (req, res, next) => {
+    const review = await Review.findById(req.params.id)
+    if (req.user.role !== 'admin') {
+        if (review.author.id !== req.user.id) return next(new AppError(`You cannot edit someone's else review.`, 401));
+    }
+    next();
+};
 
 
 exports.setTourUserIds = (req, res, next) => {
