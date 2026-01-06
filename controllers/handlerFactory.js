@@ -56,7 +56,7 @@ exports.getAll = Model => catchAsync(async (req, res, next) => {
         .sort()
         .limitFields()
         .paginate();
-    const docs = await features.query;
+    const docs = await features.query
     // SEND RESPONSE
     res.status(200).json({
         status: 'success',

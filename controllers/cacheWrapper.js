@@ -1,7 +1,11 @@
 const cache = require('../utils/cache');
 
-exports.cachedGetAll = (key, factoryFn) => {
+exports.cachedGetAll = (baseKey, factoryFn) => {
     return async (req, res, next) => {
+        const queryString = JSON.stringify(req.query);
+        const key = Object.keys(req.query).length > 0
+            ? `${baseKey}:${queryString}`
+            : baseKey;
         const cached = cache.get(key);
         if (cached) {
             return res.status(200).json({
@@ -10,13 +14,14 @@ exports.cachedGetAll = (key, factoryFn) => {
                 data: cached
             });
         }
-
+        // I want to cache the response only barefoot
         const originalJson = res.json.bind(res);
-
-        res.json = (body) => {
-            cache.set(key, body.data);
-            return originalJson(body);
-        };
+        if (Object.keys(req.query).length === 0) {
+            res.json = (body) => {
+                cache.set(key, body.data);
+                return originalJson(body);
+            };
+        }
 
         factoryFn(req, res, next);
     };
